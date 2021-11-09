@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
+import { IUsersItem } from './types';
 
-const UsersSchema = new Schema({
+const UsersSchema = new Schema<IUsersItem>({
   apartment: {
     type: Number,
     required: true,
@@ -23,4 +24,6 @@ const UsersSchema = new Schema({
   },
 });
 
-export const Users = model('Users', UsersSchema);
+export const Users = model<IUsersItem>('Users', UsersSchema);
+
+export * from './types';

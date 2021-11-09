@@ -1,17 +1,32 @@
-import { IResolvers } from '@graphql-tools/utils';
+import type { IResolvers } from '@graphql-tools/utils';
+import { ApolloError } from 'apollo-server-hapi';
 
-import { IUserItem } from '../routes/users';
 import { Users } from '../models';
 
-const resolvers: IResolvers = {
+import type { IResolversArguments } from './types';
+
+/**
+ * Resolvers function:
+ * (source: TSource, args: TArgs, context: TContext, info: GraphQLResolveInfo) => TReturn;
+ */
+const resolvers: IResolvers<
+  unknown,
+  unknown,
+  IResolversArguments,
+  Promise<unknown>
+> = {
   Query: {
-    getUsers: () =>
-      new Promise((resolve, reject) =>
-        Users.find((err, users) => (err ? reject(err) : resolve(users))),
-      ),
+    getUsers: async () => {
+      try {
+        const response = await Users.find();
+        return response;
+      } catch (error) {
+        throw new ApolloError(error);
+      }
+    },
   },
   Mutation: {
-    addUser: async (_: unknown, { data }: { data: IUserItem }) => {
+    addUser: async (_, { data }) => {
       const user = new Users({
         apartment: data.apartment,
         firstName: data.firstName,
